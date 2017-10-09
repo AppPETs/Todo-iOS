@@ -2,6 +2,10 @@ import Foundation
 
 class TaskModel {
 
+	enum Error: Swift.Error {
+		case invalidMaximumTaskId
+	}
+
 	enum Section: Int {
 		case open = 0
 		case completed
@@ -132,7 +136,63 @@ class TaskModel {
 		return IndexPath(row: idx, section: section.rawValue)
 	}
 
-	func store(task: Task, with id: TaskId, completion: @escaping (Error?) -> Void) {
+	func load(completion: @escaping (Swift.Error?) -> Void) {
+		storage.retrieve(for: TaskModel.MaximimumIdKey) {
+			value, error in
+
+			assert((value == nil) != (error == nil))
+
+			guard let value = value else {
+				if let error = error as? FakeKeyValueStore.Error, error == .valueDoesNotExist {
+					completion(nil)
+				} else {
+					completion(error)
+				}
+				return
+			}
+
+			guard let maximiumTaskId = TaskId(bytes: value) else {
+				completion(Error.invalidMaximumTaskId)
+				return
+			}
+
+			self.cachedMaximumTaskId = maximiumTaskId
+
+			let errorOccurred = false
+			let semaphore = DispatchSemaphore(value: Int(maximiumTaskId.value))
+			for current in 0..<maximiumTaskId.value {
+				let taskId = TaskId(current)
+
+				self.storage.retrieve(for: taskId.key) {
+					value, error in
+
+					assert((value == nil) != (error == nil))
+
+					guard let json = value else {
+						if let error = error as? FakeKeyValueStore.Error, error != .valueDoesNotExist {
+							completion(error)
+						}
+						semaphore.signal()
+						return
+					}
+
+					do {
+						let task = try JSONDecoder().decode(Task.self, from: json)
+						self.tasks[taskId] = task
+					} catch {
+						completion(error)
+					}
+					semaphore.signal()
+				}
+			}
+			semaphore.wait()
+			if !errorOccurred {
+				completion(nil)
+			}
+		}
+	}
+
+	func store(task: Task, with id: TaskId, completion: @escaping (Swift.Error?) -> Void) {
 		do {
 			let json = try JSONEncoder().encode(task)
 			tasks[id] = task

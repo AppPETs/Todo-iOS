@@ -22,7 +22,22 @@ class TaskTableViewController: UITableViewController {
 
         self.navigationItem.leftBarButtonItem = self.editButtonItem
 
-		// <#TODO#> Load initial model
+		self.navigationItem.leftBarButtonItem?.isEnabled = false
+		self.navigationItem.rightBarButtonItem?.isEnabled = false
+
+		model.load {
+			error in
+
+			guard error == nil else {
+				self.showError("Failed to load tasks: \(error!.localizedDescription)")
+				return
+			}
+
+			DispatchQueue.main.async {
+				self.navigationItem.leftBarButtonItem?.isEnabled = true
+				self.navigationItem.rightBarButtonItem?.isEnabled = true
+			}
+		}
     }
 
     override func didReceiveMemoryWarning() {
