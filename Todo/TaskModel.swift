@@ -19,9 +19,26 @@ class TaskModel {
 			self.init(UInt16(value))
 		}
 
+		init?(bytes: Data) {
+			guard bytes.count == MemoryLayout<UInt16>.size else {
+				return nil
+			}
+
+			self.init((UInt16(bytes[0]) << 8) + UInt16(bytes[1]))
+		}
+
 		var key: KeyValueStorage.Key {
 			get {
 				return "task_\(value)"
+			}
+		}
+
+		var bytes: Data {
+			get {
+				var bytes = Data()
+				bytes.append(UInt8(value >> 8))
+				bytes.append(UInt8(value & 0xFF))
+				return bytes
 			}
 		}
 	}
@@ -36,6 +53,8 @@ class TaskModel {
 			}
 		}
 	}
+
+	static let MaximimumIdKey = "task_max"
 
 	private var storage = FakeKeyValueStore()
 	private var tasks: [TaskId: Task] = [:]
@@ -60,6 +79,14 @@ class TaskModel {
 	private var completedTaskIdPairs: [RemoteTask] {
 		get {
 			return sortedTaskIdPairs.filter({ $0.task!.isCompleted })
+		}
+	}
+
+	var cachedMaximumTaskId: TaskId = TaskId(0)
+
+	var maximumTaskId: TaskId {
+		get {
+			return tasks.keys.max() ?? TaskId(0)
 		}
 	}
 
@@ -108,7 +135,23 @@ class TaskModel {
 	func store(task: Task, with id: TaskId, completion: @escaping (Error?) -> Void) {
 		do {
 			let json = try JSONEncoder().encode(task)
-			storage.store(value: json, for: id.key, finished: completion)
+			tasks[id] = task
+
+			if cachedMaximumTaskId < maximumTaskId {
+				storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
+					error in
+
+					guard error == nil else {
+						completion(error)
+						return
+					}
+
+					self.cachedMaximumTaskId = self.maximumTaskId
+					self.storage.store(value: json, for: id.key, finished: completion)
+				}
+			} else {
+				storage.store(value: json, for: id.key, finished: completion)
+			}
 		} catch {
 			completion(error)
 		}
@@ -116,7 +159,23 @@ class TaskModel {
 
 	func removeTask(at indexPath: IndexPath, completion: @escaping (Swift.Error?) -> Void) {
 		let remoteTask = self.remoteTask(for: indexPath)
-		storage.removeValue(forKey: remoteTask.key, finished: completion)
+		tasks.removeValue(forKey: remoteTask.id)
+
+		if maximumTaskId < cachedMaximumTaskId {
+			storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
+				error in
+
+				guard error == nil else {
+					completion(error)
+					return
+				}
+
+				self.cachedMaximumTaskId = self.maximumTaskId
+				self.storage.removeValue(forKey: remoteTask.key, finished: completion)
+			}
+		} else {
+			storage.removeValue(forKey: remoteTask.key, finished: completion)
+		}
 	}
 
 	private func section(for indexPath: IndexPath) -> Section {
