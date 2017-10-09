@@ -10,7 +10,8 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var descriptionEdit: UITextField!
 	@IBOutlet weak var saveButton: UIBarButtonItem!
 
-	var remoteTask: TaskIdPair?
+	var taskId: TaskModel.TaskId!
+	var task: Task?
 
 	var mode: Mode {
 		get {
@@ -36,7 +37,7 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 
 		descriptionEdit.delegate = self
 
-		if let task = remoteTask?.task {
+		if let task = task {
 			descriptionEdit.text = task.description
 			navigationItem.title = "Edit Task"
 		}
@@ -71,11 +72,7 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 			case .add:
 				dismiss(animated: true)
 			case .edit:
-				if let owningNavigationController = navigationController {
-					owningNavigationController.popViewController(animated: true)
-				} else {
-					fatalError("There should be a navigation controller!")
-				}
+				navigationController!.popViewController(animated: true)
 		}
 	}
 
@@ -86,6 +83,6 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 			return
 		}
 
-		remoteTask = remoteTask!.replacing(task: taskFromUi())
+		task = taskFromUi()
 	}
 }

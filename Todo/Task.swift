@@ -17,18 +17,3 @@ struct Task: Codable {
 		return Task(description: description, isCompleted: !isCompleted)!
 	}
 }
-
-struct TaskIdPair {
-	let id: UInt16
-	let task: Task?
-
-	var key: KeyValueStorage.Key {
-		get {
-			return "task_\(id)"
-		}
-	}
-
-	func replacing(task: Task?) -> TaskIdPair {
-		return TaskIdPair(id: id, task: task)
-	}
-}

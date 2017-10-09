@@ -2,84 +2,9 @@ import UIKit
 
 class TaskTableViewController: UITableViewController {
 
-	private enum Section: Int {
-		case open = 0
-		case completed
-		case count
-	}
+	typealias Section = TaskModel.Section
 
-	private var storage = FakeKeyValueStore()
-	private var tasks: [UInt16: Task] = [:]
-
-	private var nextFreeTaskId: UInt16 {
-		get {
-			let taskIds = tasks.keys.sorted()
-			for newId in 0..<taskIds.count {
-				if UInt16(newId) < taskIds[newId] {
-					return UInt16(newId)
-				}
-			}
-			return UInt16(taskIds.count)
-		}
-	}
-
-	private var sortedTaskIdPairs: [TaskIdPair] {
-		get {
-			var result: [TaskIdPair] = []
-			for id in tasks.keys.sorted() {
-				guard let task = tasks[id] else { continue }
-				result.append(TaskIdPair(id: id, task: task))
-			}
-			return result
-		}
-	}
-
-	private var openTaskIdPairs: [TaskIdPair] {
-		get {
-			return sortedTaskIdPairs.filter({ !$0.task!.isCompleted })
-		}
-	}
-
-	private var completedTaskIdPairs: [TaskIdPair] {
-		get {
-			return sortedTaskIdPairs.filter({ $0.task!.isCompleted })
-		}
-	}
-
-	private func section(for indexPath: IndexPath) -> Section {
-		assert(0 <= indexPath.section)
-		assert(indexPath.section < Section.count.rawValue)
-
-		return Section(rawValue: indexPath.section)!
-	}
-
-	private func taskIdPairs(for section: Section) -> [TaskIdPair] {
-		switch section {
-			case .open:
-				return openTaskIdPairs
-			case .completed:
-				return completedTaskIdPairs
-			case .count:
-				fatalError("This should not be reachable!")
-		}
-	}
-
-	private func taskIdPair(for indexPath: IndexPath) -> TaskIdPair {
-		return taskIdPairs(for: section(for: indexPath))[indexPath.row]
-	}
-
-	private func indexPath(for remoteTask: TaskIdPair) -> IndexPath {
-		precondition(remoteTask.task != nil)
-
-		let section: Section = remoteTask.task!.isCompleted ? .completed : .open
-		let tasks = taskIdPairs(for: section)
-
-		guard let idx = tasks.index(where: { $0.id == remoteTask.id }) else {
-			return IndexPath(row: tasks.count - 1, section: section.rawValue)
-		}
-
-		return IndexPath(row: idx, section: section.rawValue)
-	}
+	let model = TaskModel()
 
 	private func showError(_ message: String, title: String = "Error") {
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -96,6 +21,8 @@ class TaskTableViewController: UITableViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         self.navigationItem.leftBarButtonItem = self.editButtonItem
+
+		// <#TODO#> Load initial model
     }
 
     override func didReceiveMemoryWarning() {
@@ -110,13 +37,13 @@ class TaskTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return taskIdPairs(for: Section(rawValue: section)!).count
+		return model.numberOfRows(in: Section(rawValue: section)!)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as! TaskTableViewCell
 
-		let task = taskIdPair(for: indexPath).task!
+		let task = model.task(for: indexPath)
 
 		cell.descriptionLabel.text = task.description
 		cell.isCompletedSwitch.isOn = task.isCompleted
@@ -132,24 +59,18 @@ class TaskTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 		precondition(editingStyle == .delete)
 
-		let remoteTask = self.taskIdPair(for: indexPath)
-
-		storage.removeValue(forKey: remoteTask.key) {
+		model.removeTask(at: indexPath) {
 			error in
 
 			guard error == nil else {
-				self.showError("Failed to remove value for '\(remoteTask.key)': \(error!.localizedDescription)")
+				self.showError("Failed to remove value: \(error!.localizedDescription)")
 				return
 			}
 
 			DispatchQueue.main.async {
-				assert(indexPath == self.indexPath(for: remoteTask))
-
-				self.tasks.removeValue(forKey: remoteTask.id)
 				tableView.deleteRows(at: [indexPath], with: .fade)
 			}
 		}
-
     }
 
     /*
@@ -193,54 +114,42 @@ class TaskTableViewController: UITableViewController {
 				let navigationController = segue.destination as! UINavigationController
 				let viewController = navigationController.topViewController!
 				let destination = viewController as! TaskViewController
-				destination.remoteTask = TaskIdPair(id: nextFreeTaskId, task: nil)
+				destination.taskId = model.nextFreeTaskId
 			case .edit:
 				let destination = segue.destination as! TaskViewController
 				let selectedTaskCell = sender as! TaskTableViewCell
 				let indexPath = tableView.indexPath(for: selectedTaskCell)!
-				destination.remoteTask = taskIdPair(for: indexPath)
+				destination.taskId = model.taskId(for: indexPath)
+				destination.task = model.task(for: indexPath)
 		}
 	}
 
 	// MARK: Actions
 
 	@IBAction func unwindToTasks(sender: UIStoryboardSegue) {
-		if let source = sender.source as? TaskViewController, let remoteTask = source.remoteTask {
+		if let source = sender.source as? TaskViewController, let task = source.task {
 
-			guard remoteTask.task != nil else {
-				showError("Empty task")
-				return
-			}
-
+			let taskId = source.taskId!
 			let selectedIndexPath = tableView.indexPathForSelectedRow
 
-			do {
-				let json = try JSONEncoder().encode(remoteTask.task!)
-				storage.store(value: json, for: remoteTask.key) {
-					error in
+			model.store(task: task, with: taskId) {
+				error in
 
-					guard error == nil else {
-						self.showError("Failed to store task \(remoteTask.key): \(error!.localizedDescription)")
-						return
-					}
+				guard error == nil else {
+					self.showError("Failed to store task '\(taskId.key)': \(error!.localizedDescription)")
+					return
+				}
 
-					DispatchQueue.main.async {
-						self.tasks[remoteTask.id] = remoteTask.task
-
-						if let selectedIndexPath = selectedIndexPath {
-							// Update task
-							assert(self.indexPath(for: remoteTask) == selectedIndexPath)
-
-							self.tableView.reloadRows(at: [selectedIndexPath], with: .automatic)
-						} else {
-							// Add task
-							let indexPath = self.indexPath(for: remoteTask)
-							self.tableView.insertRows(at: [indexPath], with: .automatic)
-						}
+				DispatchQueue.main.async {
+					if let selectedIndexPath = selectedIndexPath {
+						// Update task
+						self.tableView.reloadRows(at: [selectedIndexPath], with: .automatic)
+					} else {
+						// Add task
+						let indexPath = self.model.indexPath(for: taskId)
+						self.tableView.insertRows(at: [indexPath], with: .automatic)
 					}
 				}
-			} catch {
-				showError("Failed to encode task \(remoteTask.key): \(error.localizedDescription)")
 			}
 		}
 	}
@@ -250,31 +159,24 @@ class TaskTableViewController: UITableViewController {
 			let cell = tableView.cellForRow(at: indexPath) as! TaskTableViewCell
 			if cell.isCompletedSwitch === sender {
 
-				let remoteTask = taskIdPair(for: indexPath)
-				let newTask = remoteTask.task!.togglingCompletion()
+				let taskId = model.taskId(for: indexPath)
+				let task = model.task(for: indexPath)
 
-				assert(newTask.isCompleted == sender.isOn)
+				assert(task.togglingCompletion().isCompleted == sender.isOn)
 
-				do {
-					let json = try JSONEncoder().encode(newTask)
-					storage.store(value: json, for: remoteTask.key) {
-						error in
+				model.store(task: task.togglingCompletion(), with: taskId) {
+					error in
 
-						guard error == nil else {
-							self.showError("Failed to store task \(remoteTask.key): \(error!.localizedDescription)")
-							return
-						}
-
-						DispatchQueue.main.async {
-							self.tasks[remoteTask.id] = newTask
-
-							let newIndexPath = self.indexPath(for: remoteTask.replacing(task: newTask))
-
-							self.tableView.moveRow(at: indexPath, to: newIndexPath)
-						}
+					guard error == nil else {
+						self.showError("Failed to store task '\(taskId.key)': \(error!.localizedDescription)")
+						return
 					}
-				} catch {
-					showError("Failed to encode task \(remoteTask.key): \(error.localizedDescription)")
+
+					DispatchQueue.main.async {
+						let newIndexPath = self.model.indexPath(for: taskId)
+
+						self.tableView.moveRow(at: indexPath, to: newIndexPath)
+					}
 				}
 
 				return

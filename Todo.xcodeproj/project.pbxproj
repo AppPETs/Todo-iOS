@@ -11,6 +11,7 @@
 		605475CD1F85205F005F7C76 /* KeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605475CC1F85205F005F7C76 /* KeyValueStore.swift */; };
 		6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF21F84CDD4006B5ECE /* Task.swift */; };
 		6070ADF51F84CF4B006B5ECE /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */; };
+		607EFC251F8BA1A80084692A /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EFC241F8BA1A80084692A /* TaskModel.swift */; };
 		60E4DE5B1F828EDA00D04E9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */; };
 		60E4DE5D1F828EDA00D04E9A /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */; };
 		60E4DE601F828EDA00D04E9A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60E4DE5E1F828EDA00D04E9A /* Main.storyboard */; };
@@ -23,6 +24,7 @@
 		605475CC1F85205F005F7C76 /* KeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStore.swift; sourceTree = "<group>"; };
 		6070ADF21F84CDD4006B5ECE /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
+		607EFC241F8BA1A80084692A /* TaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskModel.swift; sourceTree = "<group>"; };
 		60E4DE571F828EDA00D04E9A /* Todo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */,
 				605475CC1F85205F005F7C76 /* KeyValueStore.swift */,
 				6070ADF21F84CDD4006B5ECE /* Task.swift */,
+				607EFC241F8BA1A80084692A /* TaskModel.swift */,
 				6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */,
 				605475CA1F84D287005F7C76 /* TaskTableViewController.swift */,
 				60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */,
@@ -170,6 +173,7 @@
 				6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */,
 				60E4DE5B1F828EDA00D04E9A /* AppDelegate.swift in Sources */,
 				605475CD1F85205F005F7C76 /* KeyValueStore.swift in Sources */,
+				607EFC251F8BA1A80084692A /* TaskModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
