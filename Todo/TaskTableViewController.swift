@@ -4,7 +4,7 @@ class TaskTableViewController: UITableViewController {
 
 	typealias Section = TaskModel.Section
 
-	let model = TaskModel()
+	let model = TaskModel()!
 
 	private func showError(_ message: String, title: String = "Error") {
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

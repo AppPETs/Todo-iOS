@@ -1,5 +1,8 @@
 import Foundation
 
+import PrivacyKit
+import Tafelsalz
+
 class TaskModel {
 
 	enum Error: Swift.Error {
@@ -60,8 +63,19 @@ class TaskModel {
 
 	static let MaximimumIdKey = "task_max"
 
-	private var storage = FakeKeyValueStore()
+	private let context = SecureKeyValueStorage.Context("TODOLIST")!
+	private let persona = Persona(uniqueName: "primaryUser")
+	private let privacyService = PrivacyService(baseUrl: URL(string: "https://privacyservice.test:8080")!)
+	private let storage: SecureKeyValueStorage
 	private var tasks: [TaskId: Task] = [:]
+
+	init?() {
+		guard let storage = SecureKeyValueStorage(with: privacyService, for: persona, context: context) else {
+			return nil
+		}
+
+		self.storage = storage
+	}
 
 	private var sortedTaskIdPairs: [RemoteTask] {
 		get {
@@ -137,42 +151,49 @@ class TaskModel {
 	}
 
 	func load(completion: @escaping (Swift.Error?) -> Void) {
+		var errorOccurred = false
+		let taskMaxSemaphore = DispatchSemaphore(value: 0)
+
 		storage.retrieve(for: TaskModel.MaximimumIdKey) {
 			value, error in
 
 			assert((value == nil) != (error == nil))
 
 			guard let value = value else {
-				if let error = error as? FakeKeyValueStore.Error, error == .valueDoesNotExist {
+				if let error = error as? SecureKeyValueStorage.Error, error == .valueDoesNotExist {
 					completion(nil)
 				} else {
+					errorOccurred = true
 					completion(error)
 				}
+				taskMaxSemaphore.signal()
 				return
 			}
 
 			guard let maximiumTaskId = TaskId(bytes: value) else {
+				errorOccurred = true
 				completion(Error.invalidMaximumTaskId)
+				taskMaxSemaphore.signal()
 				return
 			}
 
 			self.cachedMaximumTaskId = maximiumTaskId
 
-			let errorOccurred = false
-			let semaphore = DispatchSemaphore(value: Int(maximiumTaskId.value))
 			for current in 0..<maximiumTaskId.value {
 				let taskId = TaskId(current)
 
+				let taskFetchSemaphore = DispatchSemaphore(value: 0)
 				self.storage.retrieve(for: taskId.key) {
 					value, error in
 
 					assert((value == nil) != (error == nil))
 
 					guard let json = value else {
-						if let error = error as? FakeKeyValueStore.Error, error != .valueDoesNotExist {
+						if let error = error as? SecureKeyValueStorage.Error, error != .valueDoesNotExist {
+							errorOccurred = true
 							completion(error)
 						}
-						semaphore.signal()
+						taskFetchSemaphore.signal()
 						return
 					}
 
@@ -180,15 +201,25 @@ class TaskModel {
 						let task = try JSONDecoder().decode(Task.self, from: json)
 						self.tasks[taskId] = task
 					} catch {
+						errorOccurred = true
 						completion(error)
 					}
-					semaphore.signal()
+
+					taskFetchSemaphore.signal()
+				}
+
+				taskFetchSemaphore.wait()
+				if !errorOccurred {
+					completion(nil)
 				}
 			}
-			semaphore.wait()
-			if !errorOccurred {
-				completion(nil)
-			}
+
+			taskMaxSemaphore.signal()
+		}
+
+		taskMaxSemaphore.wait()
+		if !errorOccurred {
+			completion(nil)
 		}
 	}
 
@@ -231,10 +262,10 @@ class TaskModel {
 				}
 
 				self.cachedMaximumTaskId = self.maximumTaskId
-				self.storage.removeValue(forKey: remoteTask.key, finished: completion)
+				self.storage.remove(for: remoteTask.key, finished: completion)
 			}
 		} else {
-			storage.removeValue(forKey: remoteTask.key, finished: completion)
+			storage.remove(for: remoteTask.key, finished: completion)
 		}
 	}
 

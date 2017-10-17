@@ -1,0 +1,3 @@
+[submodule "Dependencies/PrivacyKit"]
+	path = Dependencies/PrivacyKit
+	url = git@gitlab.prae.me:apppets/PrivacyKit.git
