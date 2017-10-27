@@ -184,7 +184,7 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="eX1-lu-Sxi">
                                 <rect key="frame" x="8" y="72" width="359" height="587"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="defaultPhoto" translatesAutoresizingMaskIntoConstraints="NO" id="cOQ-mY-utU" customClass="ConfidentialQRCodeView" customModule="Todo" customModuleProvider="target">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="defaultPhoto" translatesAutoresizingMaskIntoConstraints="NO" id="cOQ-mY-utU" customClass="ConfidentialQrCodeView" customModule="PrivacyKit">
                                         <rect key="frame" x="0.0" y="0.0" width="359" height="358.5"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="cOQ-mY-utU" secondAttribute="height" multiplier="1:1" id="kFq-fS-rca"/>

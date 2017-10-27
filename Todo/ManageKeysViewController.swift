@@ -1,5 +1,6 @@
 import UIKit
 
+import PrivacyKit
 import QRCodeReader
 import Tafelsalz
 
@@ -11,7 +12,7 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 
 	var qrCodeReader: QRCodeReader? = nil
 
-	@IBOutlet weak var exportMasterKeyView: ConfidentialQRCodeView!
+	@IBOutlet weak var exportMasterKeyView: ConfidentialQrCodeView!
 	@IBOutlet weak var importTextField: UITextField!
 	@IBOutlet weak var importButton: UIButton!
 
