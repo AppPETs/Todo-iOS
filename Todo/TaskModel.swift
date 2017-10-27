@@ -3,16 +3,20 @@ import Foundation
 import PrivacyKit
 import Tafelsalz
 
+protocol TaskModelObserver {
+	func startedLoading()
+	func progress(percentage: Float)
+	func errorOccurred(error: Error)
+	func finishedLoading()
+	func added(task: Task, withId: TaskModel.TaskId)
+	func edited(task: Task, withId: TaskModel.TaskId)
+	func removed(taskWithId: TaskModel.TaskId)
+}
+
 class TaskModel {
 
 	enum Error: Swift.Error {
 		case invalidMaximumTaskId
-	}
-
-	enum Section: Int {
-		case open = 0
-		case completed
-		case count
 	}
 
 	struct TaskId {
@@ -50,24 +54,25 @@ class TaskModel {
 		}
 	}
 
-	struct RemoteTask {
-		let id: TaskId
-		let task: Task?
+	static let MaximimumIdKey = "task_max"
 
-		var key: KeyValueStorage.Key {
-			get {
-				return id.key
+	private var observers: [TaskModelObserver] = []
+
+	private var pending: Set<KeyValueStorage.Key> = [] {
+		didSet {
+			observers.forEach { $0.progress(percentage: currentProgress) }
+			if pending.isEmpty {
+				observers.forEach { $0.finishedLoading() }
 			}
 		}
 	}
 
-	static let MaximimumIdKey = "task_max"
+	let persona = Persona(uniqueName: "primaryUser")
 
 	private let context = SecureKeyValueStorage.Context("TODOLIST")!
-	private let persona = Persona(uniqueName: "primaryUser")
 	private let privacyService = PrivacyService(baseUrl: URL(string: "https://privacyservice.test:8080")!)
 	private let storage: SecureKeyValueStorage
-	private var tasks: [TaskId: Task] = [:]
+	private var taskIds: Set<TaskId> = []
 
 	init?() {
 		guard let storage = SecureKeyValueStorage(with: privacyService, for: persona, context: context) else {
@@ -77,40 +82,23 @@ class TaskModel {
 		self.storage = storage
 	}
 
-	private var sortedTaskIdPairs: [RemoteTask] {
-		get {
-			var result: [RemoteTask] = []
-			for id in tasks.keys.sorted() {
-				guard let task = tasks[id] else { continue }
-				result.append(RemoteTask(id: id, task: task))
-			}
-			return result
-		}
-	}
+	func addObserver(_ observer: TaskModelObserver) {
+		precondition(pending.isEmpty)
 
-	private var openTaskIdPairs: [RemoteTask] {
-		get {
-			return sortedTaskIdPairs.filter({ !$0.task!.isCompleted })
-		}
-	}
-
-	private var completedTaskIdPairs: [RemoteTask] {
-		get {
-			return sortedTaskIdPairs.filter({ $0.task!.isCompleted })
-		}
+		observers.append(observer)
 	}
 
 	var cachedMaximumTaskId: TaskId = TaskId(0)
 
 	var maximumTaskId: TaskId {
 		get {
-			return tasks.keys.max() ?? TaskId(0)
+			return taskIds.max() ?? TaskId(0)
 		}
 	}
 
 	var nextFreeTaskId: TaskId {
 		get {
-			let taskIds = tasks.keys.sorted()
+			let taskIds = self.taskIds.sorted()
 			for current in 0..<taskIds.count {
 				let taskId = TaskId(current)
 				if taskId < taskIds[current] {
@@ -121,174 +109,172 @@ class TaskModel {
 		}
 	}
 
-	func numberOfRows(in section: Section) -> Int {
-		precondition(section != .count)
-
-		return remoteTasks(for: section).count
-	}
-
-	func task(for indexPath: IndexPath) -> Task {
-		return remoteTask(for: indexPath).task!
-	}
-
-	func taskId(for indexPath: IndexPath) -> TaskId {
-		return remoteTask(for: indexPath).id
-	}
-
-	func section(for taskId: TaskId) -> Section {
-		return tasks[taskId]!.isCompleted ? .completed : .open
-	}
-
-	func indexPath(for taskId: TaskId) -> IndexPath {
-		let section = self.section(for: taskId)
-		let tasks = remoteTasks(for: section)
-
-		guard let idx = tasks.index(where: { $0.id == taskId }) else {
-			return IndexPath(row: tasks.count - 1, section: section.rawValue)
+	var currentProgress: Float {
+		get {
+			let overall = Int(cachedMaximumTaskId.value) + 1
+			return Float(overall - pending.count) / Float(overall)
 		}
-
-		return IndexPath(row: idx, section: section.rawValue)
 	}
 
-	func load(completion: @escaping (Swift.Error?) -> Void) {
-		var errorOccurred = false
-		let taskMaxSemaphore = DispatchSemaphore(value: 0)
+	func load() {
+		precondition(pending.isEmpty)
+
+		observers.forEach { $0.startedLoading() }
+		pending.insert(TaskModel.MaximimumIdKey)
 
 		storage.retrieve(for: TaskModel.MaximimumIdKey) {
-			value, error in
+			optionalValue, optionalError in
 
-			assert((value == nil) != (error == nil))
+			assert((optionalValue == nil) != (optionalError == nil))
 
-			guard let value = value else {
-				if let error = error as? SecureKeyValueStorage.Error, error == .valueDoesNotExist {
-					completion(nil)
+			guard let value = optionalValue else {
+				if let error = optionalError as? SecureKeyValueStorage.Error, error == .valueDoesNotExist {
+					// Ignore
 				} else {
-					errorOccurred = true
-					completion(error)
+					self.observers.forEach { $0.errorOccurred(error: optionalError!) }
 				}
-				taskMaxSemaphore.signal()
+				self.pending.remove(TaskModel.MaximimumIdKey)
 				return
 			}
 
 			guard let maximiumTaskId = TaskId(bytes: value) else {
-				errorOccurred = true
-				completion(Error.invalidMaximumTaskId)
-				taskMaxSemaphore.signal()
+				self.observers.forEach { $0.errorOccurred(error: Error.invalidMaximumTaskId) }
+				self.pending.remove(TaskModel.MaximimumIdKey)
 				return
 			}
 
 			self.cachedMaximumTaskId = maximiumTaskId
 
-			for current in 0..<maximiumTaskId.value {
+			for current in 0...maximiumTaskId.value {
 				let taskId = TaskId(current)
+				self.pending.insert(taskId.key)
 
-				let taskFetchSemaphore = DispatchSemaphore(value: 0)
 				self.storage.retrieve(for: taskId.key) {
-					value, error in
+					optionalValue, optionalError in
 
-					assert((value == nil) != (error == nil))
+					assert((optionalValue == nil) != (optionalError == nil))
 
-					guard let json = value else {
-						if let error = error as? SecureKeyValueStorage.Error, error != .valueDoesNotExist {
-							errorOccurred = true
-							completion(error)
+					guard let json = optionalValue else {
+						if let error = optionalError as? SecureKeyValueStorage.Error, error == .valueDoesNotExist {
+							// Ignore
+						} else {
+							self.observers.forEach { $0.errorOccurred(error: optionalError!) }
 						}
-						taskFetchSemaphore.signal()
+						self.pending.remove(taskId.key)
 						return
 					}
 
 					do {
 						let task = try JSONDecoder().decode(Task.self, from: json)
-						self.tasks[taskId] = task
+						self.taskIds.insert(taskId)
+						self.observers.forEach { $0.added(task: task, withId: taskId) }
 					} catch {
-						errorOccurred = true
-						completion(error)
+						self.observers.forEach { $0.errorOccurred(error: error) }
 					}
-
-					taskFetchSemaphore.signal()
-				}
-
-				taskFetchSemaphore.wait()
-				if !errorOccurred {
-					completion(nil)
+					self.pending.remove(taskId.key)
 				}
 			}
 
-			taskMaxSemaphore.signal()
-		}
-
-		taskMaxSemaphore.wait()
-		if !errorOccurred {
-			completion(nil)
+			self.pending.remove(TaskModel.MaximimumIdKey)
 		}
 	}
 
-	func store(task: Task, with id: TaskId, completion: @escaping (Swift.Error?) -> Void) {
+	private func onlyStoreSingle(task: Task, withId taskId: TaskId) {
+		let json = try! JSONEncoder().encode(task)
+
+		let isEdit = taskIds.contains(taskId)
+
+		storage.store(value: json, for: taskId.key) {
+			optionalError in
+
+			if let error = optionalError {
+				self.observers.forEach { $0.errorOccurred(error: error) }
+			}
+
+			self.taskIds.insert(taskId)
+			if isEdit {
+				self.observers.forEach { $0.edited(task: task, withId: taskId) }
+			} else {
+				self.observers.forEach { $0.added(task: task, withId: taskId) }
+			}
+			self.pending.remove(taskId.key)
+		}
+	}
+
+	func store(task: Task, with taskId: TaskId) {
+		precondition(pending.isEmpty)
+
+		observers.forEach { $0.startedLoading() }
+		pending.insert(taskId.key)
+
 		do {
-			let json = try JSONEncoder().encode(task)
-			tasks[id] = task
+			let _ = try JSONEncoder().encode(task)
 
 			if cachedMaximumTaskId < maximumTaskId {
+				pending.insert(TaskModel.MaximimumIdKey)
 				storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
-					error in
+					optionalError in
 
-					guard error == nil else {
-						completion(error)
+					guard optionalError == nil else {
+						self.observers.forEach { $0.errorOccurred(error: optionalError!) }
+						self.pending.remove(TaskModel.MaximimumIdKey)
 						return
 					}
 
 					self.cachedMaximumTaskId = self.maximumTaskId
-					self.storage.store(value: json, for: id.key, finished: completion)
+					self.pending.remove(TaskModel.MaximimumIdKey)
+
+					self.onlyStoreSingle(task: task, withId: taskId)
 				}
 			} else {
-				storage.store(value: json, for: id.key, finished: completion)
+				onlyStoreSingle(task: task, withId: taskId)
 			}
 		} catch {
-			completion(error)
+			observers.forEach { $0.errorOccurred(error: error) }
+			pending.remove(taskId.key)
 		}
 	}
 
-	func removeTask(at indexPath: IndexPath, completion: @escaping (Swift.Error?) -> Void) {
-		let remoteTask = self.remoteTask(for: indexPath)
-		tasks.removeValue(forKey: remoteTask.id)
+	private func onlyRemoveSingleTask(withId taskId: TaskId) {
+		self.storage.remove(for: taskId.key) {
+			optionalError in
+
+			if let error = optionalError {
+				self.observers.forEach { $0.errorOccurred(error: error) }
+			} else {
+				self.taskIds.remove(taskId)
+				self.observers.forEach { $0.removed(taskWithId: taskId) }
+			}
+
+			self.pending.remove(taskId.key)
+		}
+	}
+
+	func removeTask(withId taskId: TaskId) {
+		precondition(pending.isEmpty)
+
+		observers.forEach { $0.startedLoading() }
+		pending.insert(taskId.key)
 
 		if maximumTaskId < cachedMaximumTaskId {
+			pending.insert(TaskModel.MaximimumIdKey)
 			storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
 				error in
 
 				guard error == nil else {
-					completion(error)
+					self.observers.forEach { $0.errorOccurred(error: error!) }
+					self.pending.remove(TaskModel.MaximimumIdKey)
 					return
 				}
 
 				self.cachedMaximumTaskId = self.maximumTaskId
-				self.storage.remove(for: remoteTask.key, finished: completion)
+				self.pending.remove(TaskModel.MaximimumIdKey)
+
+				self.onlyRemoveSingleTask(withId: taskId)
 			}
 		} else {
-			storage.remove(for: remoteTask.key, finished: completion)
+			onlyRemoveSingleTask(withId: taskId)
 		}
-	}
-
-	private func section(for indexPath: IndexPath) -> Section {
-		assert(0 <= indexPath.section)
-		assert(indexPath.section < Section.count.rawValue)
-
-		return Section(rawValue: indexPath.section)!
-	}
-
-	private func remoteTasks(for section: Section) -> [RemoteTask] {
-		switch section {
-		case .open:
-			return openTaskIdPairs
-		case .completed:
-			return completedTaskIdPairs
-		case .count:
-			fatalError("This should not be reachable!")
-		}
-	}
-
-	private func remoteTask(for indexPath: IndexPath) -> RemoteTask {
-		return remoteTasks(for: section(for: indexPath))[indexPath.row]
 	}
 
 }

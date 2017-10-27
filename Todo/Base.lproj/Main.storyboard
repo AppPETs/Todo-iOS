@@ -4,7 +4,8 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -44,7 +45,7 @@
                                 <action selector="cancel:" destination="BYZ-38-t0r" id="ciM-QY-27S"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="G9L-m7-EDr">
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="G9L-m7-EDr">
                             <connections>
                                 <segue destination="jfO-vr-ela" kind="unwind" unwindAction="unwindToTasksWithSender:" id="cu4-64-2J8"/>
                             </connections>
@@ -58,7 +59,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <exit id="jfO-vr-ela" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="924" y="34"/>
+            <point key="canvasLocation" x="988" y="401"/>
         </scene>
         <!--Tasks-->
         <scene sceneID="jy2-cc-Bnz">
@@ -68,9 +69,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <progressView key="tableHeaderView" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" progress="0.5" id="vtD-WA-yRB">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="1.5"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </progressView>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TaskTableViewCell" id="jeu-cO-7Sa" customClass="TaskTableViewCell" customModule="Todo" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="30.5" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jeu-cO-7Sa" id="bfE-PU-UB3">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -113,12 +118,20 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Tasks" id="fx1-bZ-1x4">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="7WJ-d5-iYw">
+                        <barButtonItem key="leftBarButtonItem" systemItem="add" id="7WJ-d5-iYw">
                             <connections>
                                 <segue destination="n3q-rc-SuR" kind="presentation" identifier="AddTask" id="bXl-Nr-GCO"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="91C-ng-YSv">
+                            <connections>
+                                <segue destination="VSX-4L-GkC" kind="show" identifier="ManageKeys" id="NFR-Ug-g7x"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="progressBar" destination="vtD-WA-yRB" id="NGz-Kv-2SZ"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tPj-tz-qVM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -158,9 +171,79 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hfk-RH-Uoa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="164" y="399"/>
+            <point key="canvasLocation" x="204" y="813"/>
+        </scene>
+        <!--Manage Keys View Controller-->
+        <scene sceneID="jLz-qH-8Bv">
+            <objects>
+                <viewController id="VSX-4L-GkC" customClass="ManageKeysViewController" customModule="Todo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="OYg-w9-ZfB">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="eX1-lu-Sxi">
+                                <rect key="frame" x="8" y="72" width="359" height="587"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="defaultPhoto" translatesAutoresizingMaskIntoConstraints="NO" id="cOQ-mY-utU" customClass="ConfidentialQRCodeView" customModule="Todo" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="359" height="358.5"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="cOQ-mY-utU" secondAttribute="height" multiplier="1:1" id="kFq-fS-rca"/>
+                                        </constraints>
+                                    </imageView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="LvT-hP-A61">
+                                        <rect key="frame" x="0.0" y="527" width="359" height="60"/>
+                                        <subviews>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter Base64 encoded key" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4eb-HS-ELE">
+                                                <rect key="frame" x="0.0" y="0.0" width="359" height="30"/>
+                                                <nil key="textColor"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done" secureTextEntry="YES"/>
+                                            </textField>
+                                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bzG-Xy-1no">
+                                                <rect key="frame" x="0.0" y="30" width="359" height="30"/>
+                                                <state key="normal" title="Import"/>
+                                                <connections>
+                                                    <action selector="importFromTextField" destination="VSX-4L-GkC" eventType="primaryActionTriggered" id="sw8-B5-yg0"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="cOQ-mY-utU" firstAttribute="leading" secondItem="eX1-lu-Sxi" secondAttribute="leading" id="6Op-TN-NNa"/>
+                                    <constraint firstAttribute="trailing" secondItem="cOQ-mY-utU" secondAttribute="trailing" id="CH9-aj-KWy"/>
+                                    <constraint firstAttribute="bottom" secondItem="LvT-hP-A61" secondAttribute="bottom" id="Mnc-f1-lqu"/>
+                                    <constraint firstItem="LvT-hP-A61" firstAttribute="leading" secondItem="eX1-lu-Sxi" secondAttribute="leading" id="T6b-UR-Cf1"/>
+                                    <constraint firstAttribute="trailing" secondItem="LvT-hP-A61" secondAttribute="trailing" id="W71-sG-8Zj"/>
+                                    <constraint firstItem="cOQ-mY-utU" firstAttribute="top" secondItem="eX1-lu-Sxi" secondAttribute="top" id="kVH-Bw-NnQ"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="eX1-lu-Sxi" secondAttribute="trailing" constant="8" id="6zn-qx-CfY"/>
+                            <constraint firstItem="eX1-lu-Sxi" firstAttribute="leading" secondItem="OYg-w9-ZfB" secondAttribute="leading" constant="8" id="PaV-gi-RaV"/>
+                            <constraint firstItem="eX1-lu-Sxi" firstAttribute="top" secondItem="3eq-6R-odl" secondAttribute="top" constant="8" id="WZG-gV-tWT"/>
+                            <constraint firstAttribute="bottom" secondItem="eX1-lu-Sxi" secondAttribute="bottom" constant="8" id="dgn-PO-nsa"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="3eq-6R-odl"/>
+                    </view>
+                    <connections>
+                        <outlet property="exportMasterKeyView" destination="cOQ-mY-utU" id="yPX-jp-WFb"/>
+                        <outlet property="importButton" destination="bzG-Xy-1no" id="q9x-PN-3m7"/>
+                        <outlet property="importTextField" destination="4eb-HS-ELE" id="Ual-pX-18Y"/>
+                        <segue destination="1g5-c7-rmM" kind="unwind" identifier="unwindToTasks" unwindAction="unwindToTasksWithSender:" id="q1C-FL-pG4"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Iob-Fv-qhq" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="1g5-c7-rmM" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="988" y="-333"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="defaultPhoto" width="540" height="540"/>
+    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Zm7-jd-Zd5"/>
     </inferredMetricsTieBreakers>

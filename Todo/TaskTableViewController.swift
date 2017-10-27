@@ -1,10 +1,32 @@
 import UIKit
 
-class TaskTableViewController: UITableViewController {
+class TaskTableViewController: UITableViewController, TaskModelObserver {
 
-	typealias Section = TaskModel.Section
+	enum Section: Int {
+		case open = 0
+		case completed
+		case count
+	}
 
-	let model = TaskModel()!
+	var model = TaskModel()!
+	var tasks: [TaskModel.TaskId: Task] = [:]
+	var taskMap: [TaskModel.TaskId: IndexPath] = [:]
+
+	var indexPathMap: [IndexPath: TaskModel.TaskId] {
+		get {
+			return taskMap.reduce([IndexPath: TaskModel.TaskId]()) {
+				(akku: [IndexPath: TaskModel.TaskId], current) -> [IndexPath: TaskModel.TaskId] in
+
+				let (taskId, indexPath) = current
+
+				var next = akku
+				next[indexPath] = taskId
+				return next
+			}
+		}
+	}
+
+	@IBOutlet weak var progressBar: UIProgressView!
 
 	private func showError(_ message: String, title: String = "Error") {
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -20,24 +42,8 @@ class TaskTableViewController: UITableViewController {
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-        self.navigationItem.leftBarButtonItem = self.editButtonItem
-
-		self.navigationItem.leftBarButtonItem?.isEnabled = false
-		self.navigationItem.rightBarButtonItem?.isEnabled = false
-
-		model.load {
-			error in
-
-			guard error == nil else {
-				self.showError("Failed to load tasks: \(error!.localizedDescription)")
-				return
-			}
-
-			DispatchQueue.main.async {
-				self.navigationItem.leftBarButtonItem?.isEnabled = true
-				self.navigationItem.rightBarButtonItem?.isEnabled = true
-			}
-		}
+		model.addObserver(self)
+		model.load()
     }
 
     override func didReceiveMemoryWarning() {
@@ -52,13 +58,14 @@ class TaskTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return model.numberOfRows(in: Section(rawValue: section)!)
+		return tasks.values.filter({ $0.isCompleted == (Section(rawValue: section)! == .completed) }).count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as! TaskTableViewCell
 
-		let task = model.task(for: indexPath)
+		let taskId = indexPathMap[indexPath]!
+		let task = tasks[taskId]!
 
 		cell.descriptionLabel.text = task.description
 		cell.isCompletedSwitch.isOn = task.isCompleted
@@ -74,34 +81,10 @@ class TaskTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 		precondition(editingStyle == .delete)
 
-		model.removeTask(at: indexPath) {
-			error in
+		let taskId = indexPathMap[indexPath]!
 
-			guard error == nil else {
-				self.showError("Failed to remove value: \(error!.localizedDescription)")
-				return
-			}
-
-			DispatchQueue.main.async {
-				tableView.deleteRows(at: [indexPath], with: .fade)
-			}
-		}
+		model.removeTask(withId: taskId)
     }
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		assert(0 <= section)
@@ -122,7 +105,15 @@ class TaskTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
 
-		let mode = TaskViewController.Mode(rawValue: segue.identifier!)!
+		guard segue.identifier != "ManageKeys" else {
+			let manageKeysViewController = segue.destination as! ManageKeysViewController
+			manageKeysViewController.persona = model.persona
+			return
+		}
+
+		guard let mode = TaskViewController.Mode(rawValue: segue.identifier!) else {
+			return
+		}
 
 		switch mode {
 			case .add:
@@ -134,8 +125,8 @@ class TaskTableViewController: UITableViewController {
 				let destination = segue.destination as! TaskViewController
 				let selectedTaskCell = sender as! TaskTableViewCell
 				let indexPath = tableView.indexPath(for: selectedTaskCell)!
-				destination.taskId = model.taskId(for: indexPath)
-				destination.task = model.task(for: indexPath)
+				destination.taskId = indexPathMap[indexPath]!
+				destination.task = tasks[destination.taskId]!
 		}
 	}
 
@@ -143,29 +134,19 @@ class TaskTableViewController: UITableViewController {
 
 	@IBAction func unwindToTasks(sender: UIStoryboardSegue) {
 		if let source = sender.source as? TaskViewController, let task = source.task {
+			model.store(task: task, with: source.taskId)
+		}
 
-			let taskId = source.taskId!
-			let selectedIndexPath = tableView.indexPathForSelectedRow
+		if let source = sender.source as? ManageKeysViewController, source.hasPersonaChanged {
+			// Clear task list
+			tasks = [:]
+			taskMap = [:]
+			tableView.reloadData()
 
-			model.store(task: task, with: taskId) {
-				error in
-
-				guard error == nil else {
-					self.showError("Failed to store task '\(taskId.key)': \(error!.localizedDescription)")
-					return
-				}
-
-				DispatchQueue.main.async {
-					if let selectedIndexPath = selectedIndexPath {
-						// Update task
-						self.tableView.reloadRows(at: [selectedIndexPath], with: .automatic)
-					} else {
-						// Add task
-						let indexPath = self.model.indexPath(for: taskId)
-						self.tableView.insertRows(at: [indexPath], with: .automatic)
-					}
-				}
-			}
+			// Load tasks for the new persona
+			model = TaskModel()!
+			model.addObserver(self)
+			model.load()
 		}
 	}
 
@@ -174,28 +155,88 @@ class TaskTableViewController: UITableViewController {
 			let cell = tableView.cellForRow(at: indexPath) as! TaskTableViewCell
 			if cell.isCompletedSwitch === sender {
 
-				let taskId = model.taskId(for: indexPath)
-				let task = model.task(for: indexPath)
+				let taskId = indexPathMap[indexPath]!
+				let task = tasks[taskId]!
 
 				assert(task.togglingCompletion().isCompleted == sender.isOn)
 
-				model.store(task: task.togglingCompletion(), with: taskId) {
-					error in
-
-					guard error == nil else {
-						self.showError("Failed to store task '\(taskId.key)': \(error!.localizedDescription)")
-						return
-					}
-
-					DispatchQueue.main.async {
-						let newIndexPath = self.model.indexPath(for: taskId)
-
-						self.tableView.moveRow(at: indexPath, to: newIndexPath)
-					}
-				}
+				model.store(task: task.togglingCompletion(), with: taskId)
 
 				return
 			}
 		}
 	}
+
+	// MARK: TaskModelObserver
+
+	func startedLoading() {
+		DispatchQueue.main.async {
+			self.progressBar.isHidden = false
+			self.navigationItem.leftBarButtonItem?.isEnabled = false
+			self.navigationItem.rightBarButtonItem?.isEnabled = false
+		}
+	}
+
+	func progress(percentage: Float) {
+		DispatchQueue.main.async {
+			self.progressBar.progress = percentage
+		}
+	}
+
+	func errorOccurred(error: Error) {
+		DispatchQueue.main.async {
+			self.showError(error.localizedDescription)
+		}
+	}
+
+	func finishedLoading() {
+		DispatchQueue.main.async {
+			self.progressBar.isHidden = true
+			self.navigationItem.leftBarButtonItem?.isEnabled = true
+			self.navigationItem.rightBarButtonItem?.isEnabled = true
+		}
+	}
+
+	func added(task: Task, withId taskId: TaskModel.TaskId) {
+		DispatchQueue.main.async {
+			assert(!self.taskMap.keys.contains(taskId))
+
+			let section: Section = task.isCompleted ? .completed : .open
+			let indexPath = IndexPath(row: self.tableView.numberOfRows(inSection: section.rawValue), section: section.rawValue)
+			self.tasks[taskId] = task
+			self.taskMap[taskId] = indexPath
+
+			self.tableView.insertRows(at: [indexPath], with: .automatic)
+		}
+	}
+
+	func edited(task: Task, withId taskId: TaskModel.TaskId) {
+		DispatchQueue.main.async {
+			assert(self.taskMap.keys.contains(taskId))
+
+			let oldIndexPath = self.taskMap[taskId]!
+			let section: Section = task.isCompleted ? .completed : .open
+			let newIndexPath = IndexPath(row: self.tableView.numberOfRows(inSection: section.rawValue), section: section.rawValue)
+			self.taskMap[taskId] = newIndexPath
+			self.tasks[taskId] = task
+
+			if oldIndexPath == newIndexPath {
+				self.tableView.reloadRows(at: [newIndexPath], with: .automatic)
+			} else {
+				self.tableView.moveRow(at: oldIndexPath, to: newIndexPath)
+			}
+		}
+	}
+
+	func removed(taskWithId taskId: TaskModel.TaskId) {
+		DispatchQueue.main.async {
+			assert(!self.taskMap.keys.contains(taskId))
+
+			let indexPath = self.taskMap[taskId]!
+			self.taskMap.removeValue(forKey: taskId)
+			self.tasks.removeValue(forKey: taskId)
+			self.tableView.deleteRows(at: [indexPath], with: .fade)
+		}
+	}
+
 }

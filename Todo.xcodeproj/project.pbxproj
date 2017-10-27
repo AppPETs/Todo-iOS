@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		601004BD1F976054004512EE /* ManageKeysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601004BC1F976054004512EE /* ManageKeysViewController.swift */; };
+		60509C7F1F9E093F00785EE9 /* ConfidentialQRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60509C7E1F9E093F00785EE9 /* ConfidentialQRCodeView.swift */; };
+		60509C961F9F334F00785EE9 /* QRCodeReader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60509C951F9F328E00785EE9 /* QRCodeReader.framework */; };
+		60509C971F9F334F00785EE9 /* QRCodeReader.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60509C951F9F328E00785EE9 /* QRCodeReader.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		605475CB1F84D287005F7C76 /* TaskTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605475CA1F84D287005F7C76 /* TaskTableViewController.swift */; };
 		6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF21F84CDD4006B5ECE /* Task.swift */; };
 		6070ADF51F84CF4B006B5ECE /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */; };
@@ -21,6 +25,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		60509C941F9F328E00785EE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60509C901F9F328E00785EE9 /* QRCodeReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 60B2FDD01F3A0AB200E23DF9;
+			remoteInfo = QRCodeReader;
+		};
+		60509C981F9F335000785EE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60509C901F9F328E00785EE9 /* QRCodeReader.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 60B2FDCF1F3A0AB200E23DF9;
+			remoteInfo = QRCodeReader;
+		};
 		60E775851F90E0F500AE069C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 60E7757E1F90E0F500AE069C /* PrivacyKit.xcodeproj */;
@@ -66,6 +84,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				60E775901F90E12300AE069C /* PrivacyKit.framework in Embed Frameworks */,
+				60509C971F9F334F00785EE9 /* QRCodeReader.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -73,6 +92,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		601004BC1F976054004512EE /* ManageKeysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageKeysViewController.swift; sourceTree = "<group>"; };
+		60509C7E1F9E093F00785EE9 /* ConfidentialQRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidentialQRCodeView.swift; sourceTree = "<group>"; };
+		60509C901F9F328E00785EE9 /* QRCodeReader.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = QRCodeReader.xcodeproj; path = Dependencies/QRCodeReader/QRCodeReader.xcodeproj; sourceTree = "<group>"; };
 		605475CA1F84D287005F7C76 /* TaskTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewController.swift; sourceTree = "<group>"; };
 		6070ADF21F84CDD4006B5ECE /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
@@ -93,12 +115,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				60E7758F1F90E12300AE069C /* PrivacyKit.framework in Frameworks */,
+				60509C961F9F334F00785EE9 /* QRCodeReader.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60509C911F9F328E00785EE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				60509C951F9F328E00785EE9 /* QRCodeReader.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		60E4DE4E1F828EDA00D04E9A = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +154,8 @@
 				60E4DE6C1F828EE500D04E9A /* Supporting Files */,
 				60E4DE6D1F828EF800D04E9A /* Storyboards */,
 				60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */,
+				60509C7E1F9E093F00785EE9 /* ConfidentialQRCodeView.swift */,
+				601004BC1F976054004512EE /* ManageKeysViewController.swift */,
 				6070ADF21F84CDD4006B5ECE /* Task.swift */,
 				607EFC241F8BA1A80084692A /* TaskModel.swift */,
 				6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */,
@@ -154,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				60E7757E1F90E0F500AE069C /* PrivacyKit.xcodeproj */,
+				60509C901F9F328E00785EE9 /* QRCodeReader.xcodeproj */,
 			);
 			name = Dependencies;
 			sourceTree = "<group>";
@@ -192,6 +226,7 @@
 			);
 			dependencies = (
 				60E775921F90E12400AE069C /* PBXTargetDependency */,
+				60509C991F9F335000785EE9 /* PBXTargetDependency */,
 			);
 			name = Todo;
 			productName = Todo;
@@ -230,6 +265,10 @@
 					ProductGroup = 60E7757F1F90E0F500AE069C /* Products */;
 					ProjectRef = 60E7757E1F90E0F500AE069C /* PrivacyKit.xcodeproj */;
 				},
+				{
+					ProductGroup = 60509C911F9F328E00785EE9 /* Products */;
+					ProjectRef = 60509C901F9F328E00785EE9 /* QRCodeReader.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -239,6 +278,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		60509C951F9F328E00785EE9 /* QRCodeReader.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = QRCodeReader.framework;
+			remoteRef = 60509C941F9F328E00785EE9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		60E775861F90E0F500AE069C /* PrivacyKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -287,18 +333,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60509C7F1F9E093F00785EE9 /* ConfidentialQRCodeView.swift in Sources */,
 				605475CB1F84D287005F7C76 /* TaskTableViewController.swift in Sources */,
 				6070ADF51F84CF4B006B5ECE /* TaskTableViewCell.swift in Sources */,
 				60E4DE5D1F828EDA00D04E9A /* TaskViewController.swift in Sources */,
 				6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */,
 				60E4DE5B1F828EDA00D04E9A /* AppDelegate.swift in Sources */,
 				607EFC251F8BA1A80084692A /* TaskModel.swift in Sources */,
+				601004BD1F976054004512EE /* ManageKeysViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		60509C991F9F335000785EE9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = QRCodeReader;
+			targetProxy = 60509C981F9F335000785EE9 /* PBXContainerItemProxy */;
+		};
 		60E775921F90E12400AE069C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PrivacyKit_iOS;
@@ -439,6 +492,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NMNJSTDFHQ;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Todo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-hamburg.informatik.blochberger.Todo";
@@ -454,6 +509,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NMNJSTDFHQ;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Todo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-hamburg.informatik.blochberger.Todo";
