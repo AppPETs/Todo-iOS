@@ -11,6 +11,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 	var model = TaskModel()!
 	var tasks: [TaskModel.TaskId: Task] = [:]
 	var taskMap: [TaskModel.TaskId: IndexPath] = [:]
+	var isRefreshing = false
 
 	var indexPathMap: [IndexPath: TaskModel.TaskId] {
 		get {
@@ -34,6 +35,21 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		self.present(alert, animated: true)
 	}
 
+	@objc
+	func refresh() {
+		isRefreshing = true
+
+		// Clear task list
+		tasks = [:]
+		taskMap = [:]
+		tableView.reloadData()
+
+		// Load tasks for the new persona
+		model = TaskModel()!
+		model.addObserver(self)
+		model.load()
+	}
+
 	// MARK: UIViewController
 
     override func viewDidLoad() {
@@ -41,6 +57,9 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
+
+		refreshControl = UIRefreshControl()
+		refreshControl!.addTarget(self, action: #selector(refresh), for: UIControlEvents.primaryActionTriggered)
 
 		model.addObserver(self)
 		model.load()
@@ -191,6 +210,10 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
 	func finishedLoading() {
 		DispatchQueue.main.async {
+			if self.isRefreshing {
+				self.refreshControl?.endRefreshing()
+				self.isRefreshing = false
+			}
 			self.progressBar.isHidden = true
 			self.navigationItem.leftBarButtonItem?.isEnabled = true
 			self.navigationItem.rightBarButtonItem?.isEnabled = true
