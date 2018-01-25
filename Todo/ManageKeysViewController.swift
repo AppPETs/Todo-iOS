@@ -17,7 +17,7 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var importButton: UIButton!
 
 	func importMasterKey(_ masterKey: MasterKey) {
-		let alert = UIAlertController(title: "Import key", message: "Importing a key will result in the deletion of all tasks currently displayed in the application. The tasks for the imported key will be loaded instead.", preferredStyle: .alert)
+		let alert = UIAlertController(title: "Changing Identity", message: "Importing or creating a new key will result in the deletion of all tasks currently displayed in the application. The tasks for the new key will be loaded instead.", preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "Cancel", style: .default))
 		alert.addAction(UIAlertAction(title: "Continue", style: .destructive, handler: {
 			_ in
@@ -119,6 +119,10 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 		if textField === importTextField {
 			importButton.isEnabled = masterKeyFromTextField() != nil
 		}
+	}
+
+	@IBAction func createNewIdentity() {
+		importMasterKey(MasterKey())
 	}
 
 }
