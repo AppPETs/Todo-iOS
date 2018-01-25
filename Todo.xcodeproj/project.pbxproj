@@ -14,12 +14,6 @@
 		6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF21F84CDD4006B5ECE /* Task.swift */; };
 		6070ADF51F84CF4B006B5ECE /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */; };
 		607EFC251F8BA1A80084692A /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EFC241F8BA1A80084692A /* TaskModel.swift */; };
-		60ADEE271FCD6434008EC14B /* QRCode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE261FCD6434008EC14B /* QRCode.framework */; };
-		60ADEE281FCD6434008EC14B /* QRCode.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE261FCD6434008EC14B /* QRCode.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		60ADEE2D1FCD643D008EC14B /* Tafelsalz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE2C1FCD643D008EC14B /* Tafelsalz.framework */; };
-		60ADEE2E1FCD643D008EC14B /* Tafelsalz.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE2C1FCD643D008EC14B /* Tafelsalz.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		60ADEE301FCD64C6008EC14B /* Keychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE2F1FCD64C6008EC14B /* Keychain.framework */; };
-		60ADEE311FCD64C6008EC14B /* Keychain.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60ADEE2F1FCD64C6008EC14B /* Keychain.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		60E4DE5B1F828EDA00D04E9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */; };
 		60E4DE5D1F828EDA00D04E9A /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */; };
 		60E4DE601F828EDA00D04E9A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60E4DE5E1F828EDA00D04E9A /* Main.storyboard */; };
@@ -88,9 +82,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				60ADEE281FCD6434008EC14B /* QRCode.framework in Embed Frameworks */,
-				60ADEE2E1FCD643D008EC14B /* Tafelsalz.framework in Embed Frameworks */,
-				60ADEE311FCD64C6008EC14B /* Keychain.framework in Embed Frameworks */,
 				60E775901F90E12300AE069C /* PrivacyKit.framework in Embed Frameworks */,
 				60509C971F9F334F00785EE9 /* QRCodeReader.framework in Embed Frameworks */,
 			);
@@ -106,9 +97,6 @@
 		6070ADF21F84CDD4006B5ECE /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		607EFC241F8BA1A80084692A /* TaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskModel.swift; sourceTree = "<group>"; };
-		60ADEE261FCD6434008EC14B /* QRCode.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = QRCode.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		60ADEE2C1FCD643D008EC14B /* Tafelsalz.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Tafelsalz.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		60ADEE2F1FCD64C6008EC14B /* Keychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Keychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E4DE571F828EDA00D04E9A /* Todo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
@@ -124,9 +112,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60ADEE271FCD6434008EC14B /* QRCode.framework in Frameworks */,
-				60ADEE2D1FCD643D008EC14B /* Tafelsalz.framework in Frameworks */,
-				60ADEE301FCD64C6008EC14B /* Keychain.framework in Frameworks */,
 				60E7758F1F90E12300AE069C /* PrivacyKit.framework in Frameworks */,
 				60509C961F9F334F00785EE9 /* QRCodeReader.framework in Frameworks */,
 			);
@@ -146,9 +131,6 @@
 		60E4DE4E1F828EDA00D04E9A = {
 			isa = PBXGroup;
 			children = (
-				60ADEE2F1FCD64C6008EC14B /* Keychain.framework */,
-				60ADEE2C1FCD643D008EC14B /* Tafelsalz.framework */,
-				60ADEE261FCD6434008EC14B /* QRCode.framework */,
 				60E4DE591F828EDA00D04E9A /* Todo */,
 				60E7757D1F90E0EC00AE069C /* Dependencies */,
 				60E4DE581F828EDA00D04E9A /* Products */,
