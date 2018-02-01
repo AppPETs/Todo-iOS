@@ -52,6 +52,10 @@ class TaskModel {
 				return bytes
 			}
 		}
+
+		func next() -> TaskId {
+			return TaskId(value + 1)
+		}
 	}
 
 	static let MaximimumIdKey = "task_max"
@@ -90,12 +94,6 @@ class TaskModel {
 
 	var cachedMaximumTaskId: TaskId = TaskId(0)
 
-	var maximumTaskId: TaskId {
-		get {
-			return taskIds.max() ?? TaskId(0)
-		}
-	}
-
 	var nextFreeTaskId: TaskId {
 		get {
 			let taskIds = self.taskIds.sorted()
@@ -111,7 +109,8 @@ class TaskModel {
 
 	var currentProgress: Float {
 		get {
-			let overall = Int(cachedMaximumTaskId.value) + 1
+			let overall = Int(cachedMaximumTaskId.value)
+			guard overall != 0 else { return 0 }
 			return Float(overall - pending.count) / Float(overall)
 		}
 	}
@@ -145,7 +144,7 @@ class TaskModel {
 
 			self.cachedMaximumTaskId = maximiumTaskId
 
-			for current in 0...maximiumTaskId.value {
+			for current in 0..<maximiumTaskId.value {
 				let taskId = TaskId(current)
 				self.pending.insert(taskId.key)
 
@@ -210,9 +209,10 @@ class TaskModel {
 		do {
 			let _ = try JSONEncoder().encode(task)
 
-			if cachedMaximumTaskId < maximumTaskId {
+			let nextId = taskId.next()
+			if cachedMaximumTaskId < nextId {
 				pending.insert(TaskModel.MaximimumIdKey)
-				storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
+				storage.store(value: nextId.bytes, for: TaskModel.MaximimumIdKey) {
 					optionalError in
 
 					guard optionalError == nil else {
@@ -221,7 +221,7 @@ class TaskModel {
 						return
 					}
 
-					self.cachedMaximumTaskId = self.maximumTaskId
+					self.cachedMaximumTaskId = nextId
 					self.pending.remove(TaskModel.MaximimumIdKey)
 
 					self.onlyStoreSingle(task: task, withId: taskId)
@@ -256,9 +256,10 @@ class TaskModel {
 		observers.forEach { $0.startedLoading() }
 		pending.insert(taskId.key)
 
-		if maximumTaskId < cachedMaximumTaskId {
+		let nextId = taskId.next()
+		if cachedMaximumTaskId < nextId {
 			pending.insert(TaskModel.MaximimumIdKey)
-			storage.store(value: maximumTaskId.bytes, for: TaskModel.MaximimumIdKey) {
+			storage.store(value: nextId.bytes, for: TaskModel.MaximimumIdKey) {
 				error in
 
 				guard error == nil else {
@@ -267,7 +268,7 @@ class TaskModel {
 					return
 				}
 
-				self.cachedMaximumTaskId = self.maximumTaskId
+				self.cachedMaximumTaskId = nextId
 				self.pending.remove(TaskModel.MaximimumIdKey)
 
 				self.onlyRemoveSingleTask(withId: taskId)
