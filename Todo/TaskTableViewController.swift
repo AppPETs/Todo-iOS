@@ -237,23 +237,16 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		DispatchQueue.main.async {
 			assert(self.taskMap.keys.contains(taskId))
 
-			let oldIndexPath = self.taskMap[taskId]!
-			let section: Section = task.isCompleted ? .completed : .open
-			let newIndexPath = IndexPath(row: self.tableView.numberOfRows(inSection: section.rawValue), section: section.rawValue)
-			self.taskMap[taskId] = newIndexPath
+			let indexPath = self.taskMap[taskId]!
 			self.tasks[taskId] = task
 
-			if oldIndexPath == newIndexPath {
-				self.tableView.reloadRows(at: [newIndexPath], with: .automatic)
-			} else {
-				self.tableView.moveRow(at: oldIndexPath, to: newIndexPath)
-			}
+			self.tableView.reloadRows(at: [indexPath], with: .automatic)
 		}
 	}
 
 	func removed(taskWithId taskId: TaskModel.TaskId) {
 		DispatchQueue.main.async {
-			assert(!self.taskMap.keys.contains(taskId))
+			assert(self.taskMap.keys.contains(taskId))
 
 			let indexPath = self.taskMap[taskId]!
 			self.taskMap.removeValue(forKey: taskId)
