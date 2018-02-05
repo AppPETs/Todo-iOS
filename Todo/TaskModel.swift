@@ -147,6 +147,7 @@ class TaskModel {
 			for current in 0..<maximiumTaskId.value {
 				let taskId = TaskId(current)
 				self.pending.insert(taskId.key)
+				let semaphore = DispatchSemaphore(value: 0)
 
 				self.storage.retrieve(for: taskId.key) {
 					optionalValue, optionalError in
@@ -171,7 +172,10 @@ class TaskModel {
 						self.observers.forEach { $0.errorOccurred(error: error) }
 					}
 					self.pending.remove(taskId.key)
+					semaphore.signal()
 				}
+
+				semaphore.wait()
 			}
 
 			self.pending.remove(TaskModel.MaximimumIdKey)
