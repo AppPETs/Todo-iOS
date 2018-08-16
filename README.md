@@ -4,7 +4,7 @@ This app is a simple todo list. Its main purpose is to demonstrate the usage of 
 
 ⚠️ If you use the demo service at https://services.app-pets.org, which is the default, **all requests are logged** in order to demonstrate the information collected by a potentially malicious service operator. Your IP address will be hidden by a Shalon¹ proxy server. **Do not use this in productive apps.** There is no guarantee of availability for tasks stored with the demo service.
 
-![User Interface Mockup](https://raw.githubusercontent.com/AppPETs/Todo-iOS/master/Mockups/01-todo.pdf)
+<img src="https://raw.githubusercontent.com/AppPETs/Todo-iOS/master/Mockups/01-todo@3x.png" height="798px" width="400px" alt="User Interface Mockup"/>
 
 ## Attacker Model
 
