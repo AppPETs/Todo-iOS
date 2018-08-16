@@ -67,7 +67,7 @@ class TaskModel {
 	let persona = Persona(uniqueName: "primaryUser")
 
 	private let context = SecureKeyValueStorage.Context("TODOLIST")!
-	private let privacyService = PrivacyService(baseUrl: URL(string: "httpss://shalon1.jondonym.net:443/apppets.aot.tu-berlin.de:2235")!)
+	private let privacyService = PrivacyService(baseUrl: URL(string: "httpss://shalon1.jondonym.net:443/services.app-pets.org")!)
 	private let storage: SecureKeyValueStorage
 	private var taskIds: Set<TaskId> = []
 
