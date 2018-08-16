@@ -14,12 +14,10 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 	var task: Task?
 
 	var mode: Mode {
-		get {
-			if presentingViewController is UINavigationController {
-				return .add
-			}
-			return .edit
+		if presentingViewController is UINavigationController {
+			return .add
 		}
+		return .edit
 	}
 
 	private func taskFromUi() -> Task? {

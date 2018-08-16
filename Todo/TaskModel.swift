@@ -39,15 +39,11 @@ class TaskModel {
 		}
 
 		var key: KeyValueStorage.Key {
-			get {
-				return "task_\(value)"
-			}
+			return "task_\(value)"
 		}
 
 		var bytes: Bytes {
-			get {
-				return [UInt8(value >> 8), UInt8(value & 0xFF)]
-			}
+			return [UInt8(value >> 8), UInt8(value & 0xFF)]
 		}
 
 		func next() -> TaskId {
@@ -92,24 +88,20 @@ class TaskModel {
 	var cachedMaximumTaskId: TaskId = TaskId(0)
 
 	var nextFreeTaskId: TaskId {
-		get {
-			let taskIds = self.taskIds.sorted()
-			for current in 0..<taskIds.count {
-				let taskId = TaskId(current)
-				if taskId < taskIds[current] {
-					return taskId
-				}
+		let taskIds = self.taskIds.sorted()
+		for current in 0..<taskIds.count {
+			let taskId = TaskId(current)
+			if taskId < taskIds[current] {
+				return taskId
 			}
-			return TaskId(taskIds.count)
 		}
+		return TaskId(taskIds.count)
 	}
 
 	var currentProgress: Float {
-		get {
-			let overall = Int(cachedMaximumTaskId.value)
-			guard overall != 0 else { return 0 }
-			return Float(overall - pending.count) / Float(overall)
-		}
+		let overall = Int(cachedMaximumTaskId.value)
+		guard overall != 0 else { return 0 }
+		return Float(overall - pending.count) / Float(overall)
 	}
 
 	func load() {

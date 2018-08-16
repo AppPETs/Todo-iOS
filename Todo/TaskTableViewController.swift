@@ -14,16 +14,14 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 	var isRefreshing = false
 
 	var indexPathMap: [IndexPath: TaskModel.TaskId] {
-		get {
-			return taskMap.reduce([IndexPath: TaskModel.TaskId]()) {
-				(akku: [IndexPath: TaskModel.TaskId], current) -> [IndexPath: TaskModel.TaskId] in
+		return taskMap.reduce([IndexPath: TaskModel.TaskId]()) {
+			(akku: [IndexPath: TaskModel.TaskId], current) -> [IndexPath: TaskModel.TaskId] in
 
-				let (taskId, indexPath) = current
+			let (taskId, indexPath) = current
 
-				var next = akku
-				next[indexPath] = taskId
-				return next
-			}
+			var next = akku
+			next[indexPath] = taskId
+			return next
 		}
 	}
 
