@@ -30,7 +30,7 @@ class TaskModel {
 			self.init(UInt16(value))
 		}
 
-		init?(bytes: Data) {
+		init?(bytes: Bytes) {
 			guard bytes.count == MemoryLayout<UInt16>.size else {
 				return nil
 			}
@@ -44,12 +44,9 @@ class TaskModel {
 			}
 		}
 
-		var bytes: Data {
+		var bytes: Bytes {
 			get {
-				var bytes = Data()
-				bytes.append(UInt8(value >> 8))
-				bytes.append(UInt8(value & 0xFF))
-				return bytes
+				return [UInt8(value >> 8), UInt8(value & 0xFF)]
 			}
 		}
 
@@ -165,7 +162,7 @@ class TaskModel {
 					}
 
 					do {
-						let task = try JSONDecoder().decode(Task.self, from: json)
+						let task = try JSONDecoder().decode(Task.self, from: Data(json))
 						self.taskIds.insert(taskId)
 						self.observers.forEach { $0.added(task: task, withId: taskId) }
 					} catch {
@@ -187,7 +184,7 @@ class TaskModel {
 
 		let isEdit = taskIds.contains(taskId)
 
-		storage.store(value: json, for: taskId.key) {
+		storage.store(value: Bytes(json), for: taskId.key) {
 			optionalError in
 
 			if let error = optionalError {
