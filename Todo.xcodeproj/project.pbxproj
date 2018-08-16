@@ -14,6 +14,13 @@
 		6070ADF31F84CDD4006B5ECE /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF21F84CDD4006B5ECE /* Task.swift */; };
 		6070ADF51F84CF4B006B5ECE /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */; };
 		607EFC251F8BA1A80084692A /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EFC241F8BA1A80084692A /* TaskModel.swift */; };
+		60AAD49E21259BDC0065DFC3 /* TodoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AAD49D21259BDC0065DFC3 /* TodoUITests.swift */; };
+		60AAD4A721259E170065DFC3 /* Tafelsalz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4A621259E170065DFC3 /* Tafelsalz.framework */; };
+		60AAD4A821259E170065DFC3 /* Tafelsalz.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4A621259E170065DFC3 /* Tafelsalz.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		60AAD4AA21259E200065DFC3 /* QRCode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4A921259E200065DFC3 /* QRCode.framework */; };
+		60AAD4AB21259E200065DFC3 /* QRCode.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4A921259E200065DFC3 /* QRCode.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		60AAD4AD21259E280065DFC3 /* Keychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4AC21259E280065DFC3 /* Keychain.framework */; };
+		60AAD4AE21259E280065DFC3 /* Keychain.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60AAD4AC21259E280065DFC3 /* Keychain.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		60E4DE5B1F828EDA00D04E9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */; };
 		60E4DE5D1F828EDA00D04E9A /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */; };
 		60E4DE601F828EDA00D04E9A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60E4DE5E1F828EDA00D04E9A /* Main.storyboard */; };
@@ -37,6 +44,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 60B2FDCF1F3A0AB200E23DF9;
 			remoteInfo = QRCodeReader;
+		};
+		60AAD4A021259BDC0065DFC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60E4DE4F1F828EDA00D04E9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60E4DE561F828EDA00D04E9A;
+			remoteInfo = Todo;
 		};
 		60E775851F90E0F500AE069C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -84,6 +98,9 @@
 			files = (
 				60E775901F90E12300AE069C /* PrivacyKit.framework in Embed Frameworks */,
 				60509C971F9F334F00785EE9 /* QRCodeReader.framework in Embed Frameworks */,
+				60AAD4AE21259E280065DFC3 /* Keychain.framework in Embed Frameworks */,
+				60AAD4AB21259E200065DFC3 /* QRCode.framework in Embed Frameworks */,
+				60AAD4A821259E170065DFC3 /* Tafelsalz.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,6 +114,12 @@
 		6070ADF21F84CDD4006B5ECE /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		6070ADF41F84CF4B006B5ECE /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		607EFC241F8BA1A80084692A /* TaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskModel.swift; sourceTree = "<group>"; };
+		60AAD49B21259BDC0065DFC3 /* TodoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TodoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		60AAD49D21259BDC0065DFC3 /* TodoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoUITests.swift; sourceTree = "<group>"; };
+		60AAD49F21259BDC0065DFC3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		60AAD4A621259E170065DFC3 /* Tafelsalz.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Tafelsalz.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		60AAD4A921259E200065DFC3 /* QRCode.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = QRCode.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		60AAD4AC21259E280065DFC3 /* Keychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Keychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E4DE571F828EDA00D04E9A /* Todo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E4DE5A1F828EDA00D04E9A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		60E4DE5C1F828EDA00D04E9A /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
@@ -108,12 +131,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		60AAD49821259BDC0065DFC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60E4DE541F828EDA00D04E9A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				60E7758F1F90E12300AE069C /* PrivacyKit.framework in Frameworks */,
 				60509C961F9F334F00785EE9 /* QRCodeReader.framework in Frameworks */,
+				60AAD4AD21259E280065DFC3 /* Keychain.framework in Frameworks */,
+				60AAD4AA21259E200065DFC3 /* QRCode.framework in Frameworks */,
+				60AAD4A721259E170065DFC3 /* Tafelsalz.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,11 +161,32 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		60AAD49C21259BDC0065DFC3 /* TodoUITests */ = {
+			isa = PBXGroup;
+			children = (
+				60AAD4A521259BEE0065DFC3 /* Supporting Files */,
+				60AAD49D21259BDC0065DFC3 /* TodoUITests.swift */,
+			);
+			path = TodoUITests;
+			sourceTree = "<group>";
+		};
+		60AAD4A521259BEE0065DFC3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				60AAD49F21259BDC0065DFC3 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		60E4DE4E1F828EDA00D04E9A = {
 			isa = PBXGroup;
 			children = (
+				60AAD4AC21259E280065DFC3 /* Keychain.framework */,
+				60AAD4A921259E200065DFC3 /* QRCode.framework */,
+				60AAD4A621259E170065DFC3 /* Tafelsalz.framework */,
 				60E4DE591F828EDA00D04E9A /* Todo */,
 				60E7757D1F90E0EC00AE069C /* Dependencies */,
+				60AAD49C21259BDC0065DFC3 /* TodoUITests */,
 				60E4DE581F828EDA00D04E9A /* Products */,
 				60E7758D1F90E11000AE069C /* Frameworks */,
 			);
@@ -142,6 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				60E4DE571F828EDA00D04E9A /* Todo.app */,
+				60AAD49B21259BDC0065DFC3 /* TodoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -210,6 +265,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		60AAD49A21259BDC0065DFC3 /* TodoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60AAD4A221259BDC0065DFC3 /* Build configuration list for PBXNativeTarget "TodoUITests" */;
+			buildPhases = (
+				60AAD49721259BDC0065DFC3 /* Sources */,
+				60AAD49821259BDC0065DFC3 /* Frameworks */,
+				60AAD49921259BDC0065DFC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60AAD4A121259BDC0065DFC3 /* PBXTargetDependency */,
+			);
+			name = TodoUITests;
+			productName = TodoUITests;
+			productReference = 60AAD49B21259BDC0065DFC3 /* TodoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		60E4DE561F828EDA00D04E9A /* Todo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60E4DE691F828EDA00D04E9A /* Build configuration list for PBXNativeTarget "Todo" */;
@@ -236,10 +309,15 @@
 		60E4DE4F1F828EDA00D04E9A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0900;
+				LastSwiftUpdateCheck = 0940;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Universität Hamburg";
 				TargetAttributes = {
+					60AAD49A21259BDC0065DFC3 = {
+						CreatedOnToolsVersion = 9.4.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 60E4DE561F828EDA00D04E9A;
+					};
 					60E4DE561F828EDA00D04E9A = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
@@ -270,6 +348,7 @@
 			projectRoot = "";
 			targets = (
 				60E4DE561F828EDA00D04E9A /* Todo */,
+				60AAD49A21259BDC0065DFC3 /* TodoUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -313,6 +392,13 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		60AAD49921259BDC0065DFC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60E4DE551F828EDA00D04E9A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -326,6 +412,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		60AAD49721259BDC0065DFC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60AAD49E21259BDC0065DFC3 /* TodoUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60E4DE531F828EDA00D04E9A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -347,6 +441,11 @@
 			isa = PBXTargetDependency;
 			name = QRCodeReader;
 			targetProxy = 60509C981F9F335000785EE9 /* PBXContainerItemProxy */;
+		};
+		60AAD4A121259BDC0065DFC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60E4DE561F828EDA00D04E9A /* Todo */;
+			targetProxy = 60AAD4A021259BDC0065DFC3 /* PBXContainerItemProxy */;
 		};
 		60E775921F90E12400AE069C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -375,6 +474,40 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		60AAD4A321259BDC0065DFC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NMNJSTDFHQ;
+				INFOPLIST_FILE = TodoUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-hamburg.informatik.blochberger.TodoUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Todo;
+			};
+			name = Debug;
+		};
+		60AAD4A421259BDC0065DFC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NMNJSTDFHQ;
+				INFOPLIST_FILE = TodoUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-hamburg.informatik.blochberger.TodoUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Todo;
+			};
+			name = Release;
+		};
 		60E4DE671F828EDA00D04E9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -521,6 +654,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		60AAD4A221259BDC0065DFC3 /* Build configuration list for PBXNativeTarget "TodoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60AAD4A321259BDC0065DFC3 /* Debug */,
+				60AAD4A421259BDC0065DFC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		60E4DE521F828EDA00D04E9A /* Build configuration list for PBXProject "Todo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
