@@ -50,36 +50,36 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
 	// MARK: UIViewController
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+	override func viewDidLoad() {
+		super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+		// Uncomment the following line to preserve selection between presentations
+		// self.clearsSelectionOnViewWillAppear = false
 
 		refreshControl = UIRefreshControl()
 		refreshControl!.addTarget(self, action: #selector(refresh), for: UIControlEvents.primaryActionTriggered)
 
 		model.addObserver(self)
 		model.load()
-    }
+	}
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+	override func didReceiveMemoryWarning() {
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
 
-    // MARK: UITableViewController
+	// MARK: UITableViewController
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.count.rawValue
-    }
+	override func numberOfSections(in tableView: UITableView) -> Int {
+		return Section.count.rawValue
+	}
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return tasks.values.filter({ $0.isCompleted == (Section(rawValue: section)! == .completed) }).count
-    }
+	}
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as! TaskTableViewCell
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as! TaskTableViewCell
 
 		let taskId = indexPathMap[indexPath]!
 		let task = tasks[taskId]!
@@ -87,21 +87,21 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		cell.descriptionLabel.text = task.description
 		cell.isCompletedSwitch.isOn = task.isCompleted
 
-        return cell
-    }
+		return cell
+	}
 
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
+	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+		// Return false if you do not want the specified item to be editable.
+		return true
+	}
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 		precondition(editingStyle == .delete)
 
 		let taskId = indexPathMap[indexPath]!
 
 		model.removeTask(withId: taskId)
-    }
+	}
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		assert(0 <= section)
@@ -117,10 +117,10 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		}
 	}
 
-    // MARK: Navigation
+	// MARK: Navigation
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		super.prepare(for: segue, sender: sender)
 
 		guard segue.identifier != "ManageKeys" else {
 			let manageKeysViewController = segue.destination as! ManageKeysViewController

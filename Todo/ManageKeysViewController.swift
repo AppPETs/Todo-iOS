@@ -50,8 +50,8 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 
 	// MARK: UIViewController
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+	override func viewDidLoad() {
+		super.viewDidLoad()
 
 		importTextField.delegate = self
 
@@ -61,12 +61,12 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 		navigationItem.rightBarButtonItem = item
 
 		exportMasterKeyView.qrCode = try! persona.masterKey().qrCode()
-    }
+	}
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+	override func didReceiveMemoryWarning() {
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
 
 	// MARK: Actions
 
