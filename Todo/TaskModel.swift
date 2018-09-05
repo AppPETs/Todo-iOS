@@ -150,6 +150,7 @@ class TaskModel {
 							self.observers.forEach { $0.errorOccurred(error: optionalError!) }
 						}
 						self.pending.remove(taskId.key)
+						semaphore.signal()
 						return
 					}
 
