@@ -250,10 +250,16 @@ class TaskModel {
 		observers.forEach { $0.startedLoading() }
 		pending.insert(taskId.key)
 
-		let nextId = taskId.next()
-		if cachedMaximumTaskId < nextId {
+		onlyRemoveSingleTask(withId: taskId)
+		
+		// Maximum ID in use after removing this task
+		let maxNext = taskIds.filter({ $0 != taskId }).max()?.next() ?? TaskId(0)
+		
+		// Can we reduce the maximum task id? If so,
+		// this results in fewer network calls on startup.
+		if cachedMaximumTaskId > maxNext {
 			pending.insert(TaskModel.MaximimumIdKey)
-			storage.store(value: nextId.bytes, for: TaskModel.MaximimumIdKey) {
+			storage.store(value: maxNext.bytes, for: TaskModel.MaximimumIdKey) {
 				error in
 
 				guard error == nil else {
@@ -262,16 +268,12 @@ class TaskModel {
 					return
 				}
 
-				self.cachedMaximumTaskId = nextId
+				self.cachedMaximumTaskId = maxNext
+				print("New max key: \(self.cachedMaximumTaskId)")
 				self.pending.remove(TaskModel.MaximimumIdKey)
-
-				self.onlyRemoveSingleTask(withId: taskId)
 			}
-		} else {
-			onlyRemoveSingleTask(withId: taskId)
 		}
 	}
-
 }
 
 extension TaskModel.TaskId: Equatable {
