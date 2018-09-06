@@ -7,23 +7,81 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		case completed
 		case count
 	}
+	
+	class TableDataSource {
+		private var tableTaskMap: [Section: [TaskModel.TaskId]] = [
+			.open: [],
+			.completed: []
+		]
+		
+		func clear() {
+			self.tableTaskMap = [
+				.open: [],
+				.completed: []
+			]
+		}
+		
+		func containsTask(_ taskId: TaskModel.TaskId) -> Bool {
+			guard tableTaskMap[.open]!.index(of: taskId) == nil else { return true }
+			guard tableTaskMap[.completed]!.index(of: taskId) == nil else { return true }
+
+			return false
+		}
+		
+		func indexPath(for taskId: TaskModel.TaskId) -> IndexPath? {
+			assert(self.tableTaskMap[.open] != nil)
+			assert(self.tableTaskMap[.completed] != nil)
+			
+			if let openIndex = self.tableTaskMap[.open]!.index(of: taskId) {
+				return IndexPath(row: openIndex, section: Section.open.rawValue)
+			} else if let completedIndex = self.tableTaskMap[.completed]!.index(of: taskId) {
+				return IndexPath(row: completedIndex, section: Section.completed.rawValue)
+			}
+
+			return nil
+		}
+		
+		func taskId(for indexPath: IndexPath) -> TaskModel.TaskId {
+			let section = Section(rawValue: indexPath.section)!
+			let index = indexPath.row
+			
+			assert(self.tableTaskMap[section] != nil)
+			assert(self.tableTaskMap[section]!.count > index)
+			
+			return self.tableTaskMap[section]![index]
+		}
+		
+		func addTask(_ id: TaskModel.TaskId, completed: Bool) {
+			assert(self.indexPath(for: id) == nil)
+			
+			let section: Section = completed ? .completed : .open
+			self.tableTaskMap[section]!.append(id)
+		}
+		
+		func markTask(_ taskId: TaskModel.TaskId, as completed: Bool) {
+			let currentSection = Section(rawValue: self.indexPath(for: taskId)!.section)!
+			// Check if changes need to be made.
+			guard (currentSection == .completed && !completed) || (currentSection == .open && completed) else { return }
+			
+			removeTask(taskId)
+			addTask(taskId, completed: completed)
+		}
+
+		func removeTask(_ taskId: TaskModel.TaskId) {
+			assert(self.indexPath(for: taskId) != nil)
+			let path = self.indexPath(for: taskId)!
+			let section = Section(rawValue: path.section)!
+			
+			self.tableTaskMap[section]!.remove(at: path.row)
+		}
+	}
 
 	var model = TaskModel()!
 	var tasks: [TaskModel.TaskId: Task] = [:]
-	var taskMap: [TaskModel.TaskId: IndexPath] = [:]
+	
+	var tableDataSource: TableDataSource = TableDataSource()
+
 	var isRefreshing = false
-
-	var indexPathMap: [IndexPath: TaskModel.TaskId] {
-		return taskMap.reduce([IndexPath: TaskModel.TaskId]()) {
-			(akku: [IndexPath: TaskModel.TaskId], current) -> [IndexPath: TaskModel.TaskId] in
-
-			let (taskId, indexPath) = current
-
-			var next = akku
-			next[indexPath] = taskId
-			return next
-		}
-	}
 
 	@IBOutlet weak var progressBar: UIProgressView!
 
@@ -39,7 +97,8 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
 		// Clear task list
 		tasks = [:]
-		taskMap = [:]
+		tableDataSource.clear()
+		
 		tableView.reloadData()
 
 		// Load tasks for the new persona
@@ -81,7 +140,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as! TaskTableViewCell
 
-		let taskId = indexPathMap[indexPath]!
+		let taskId = self.tableDataSource.taskId(for: indexPath)
 		let task = tasks[taskId]!
 
 		cell.descriptionLabel.text = task.description
@@ -98,7 +157,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 		precondition(editingStyle == .delete)
 
-		let taskId = indexPathMap[indexPath]!
+		let taskId = tableDataSource.taskId(for: indexPath)
 
 		model.removeTask(withId: taskId)
 	}
@@ -142,7 +201,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 				let destination = segue.destination as! TaskViewController
 				let selectedTaskCell = sender as! TaskTableViewCell
 				let indexPath = tableView.indexPath(for: selectedTaskCell)!
-				destination.taskId = indexPathMap[indexPath]!
+				destination.taskId = self.tableDataSource.taskId(for: indexPath)
 				destination.task = tasks[destination.taskId]!
 		}
 	}
@@ -157,7 +216,8 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		if let source = sender.source as? ManageKeysViewController, source.hasPersonaChanged {
 			// Clear task list
 			tasks = [:]
-			taskMap = [:]
+			tableDataSource.clear()
+			
 			tableView.reloadData()
 
 			// Load tasks for the new persona
@@ -172,7 +232,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 			let cell = tableView.cellForRow(at: indexPath) as! TaskTableViewCell
 			if cell.isCompletedSwitch === sender {
 
-				let taskId = indexPathMap[indexPath]!
+				let taskId = self.tableDataSource.taskId(for: indexPath)
 				let task = tasks[taskId]!
 
 				assert(task.togglingCompletion().isCompleted == sender.isOn)
@@ -220,12 +280,13 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
 	func added(task: Task, withId taskId: TaskModel.TaskId) {
 		DispatchQueue.main.async {
-			assert(!self.taskMap.keys.contains(taskId))
+			assert(!self.tableDataSource.containsTask(taskId))
 
-			let section: Section = task.isCompleted ? .completed : .open
-			let indexPath = IndexPath(row: self.tableView.numberOfRows(inSection: section.rawValue), section: section.rawValue)
+			self.tableDataSource.addTask(taskId, completed: task.isCompleted)
+
 			self.tasks[taskId] = task
-			self.taskMap[taskId] = indexPath
+			
+			let indexPath = self.tableDataSource.indexPath(for: taskId)!
 
 			self.tableView.insertRows(at: [indexPath], with: .automatic)
 		}
@@ -233,21 +294,30 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 
 	func edited(task: Task, withId taskId: TaskModel.TaskId) {
 		DispatchQueue.main.async {
-			assert(self.taskMap.keys.contains(taskId))
-
-			let indexPath = self.taskMap[taskId]!
+			assert(self.tableDataSource.containsTask(taskId))
+			
+			let previousIndexPath = self.tableDataSource.indexPath(for: taskId)!
+			self.tableDataSource.markTask(taskId, as: task.isCompleted)
+			let newIndexPath = self.tableDataSource.indexPath(for: taskId)!
+			
 			self.tasks[taskId] = task
-
-			self.tableView.reloadRows(at: [indexPath], with: .automatic)
+			
+			if previousIndexPath == newIndexPath {
+				self.tableView.reloadRows(at: [previousIndexPath], with: .automatic)
+			} else {
+				self.tableView.moveRow(at: previousIndexPath, to: newIndexPath)
+			}
 		}
 	}
 
 	func removed(taskWithId taskId: TaskModel.TaskId) {
 		DispatchQueue.main.async {
-			assert(self.taskMap.keys.contains(taskId))
+			assert(self.tableDataSource.containsTask(taskId))
 
-			let indexPath = self.taskMap[taskId]!
-			self.taskMap.removeValue(forKey: taskId)
+			let indexPath = self.tableDataSource.indexPath(for: taskId)!
+			
+			self.tableDataSource.removeTask(taskId)
+
 			self.tasks.removeValue(forKey: taskId)
 			self.tableView.deleteRows(at: [indexPath], with: .fade)
 		}
