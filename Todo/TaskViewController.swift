@@ -21,7 +21,7 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func taskFromUi() -> Task? {
-		return Task(description: descriptionEdit.text ?? "")
+		return Task(description: descriptionEdit.text ?? "", isCompleted: task?.isCompleted ?? false)
 	}
 
 	private func updateState() {
