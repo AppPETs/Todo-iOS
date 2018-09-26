@@ -116,7 +116,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		// self.clearsSelectionOnViewWillAppear = false
 
 		refreshControl = UIRefreshControl()
-		refreshControl!.addTarget(self, action: #selector(refresh), for: UIControlEvents.primaryActionTriggered)
+		refreshControl!.addTarget(self, action: #selector(refresh), for: UIControl.Event.primaryActionTriggered)
 
 		model.addObserver(self)
 		model.load()
@@ -154,7 +154,7 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		return true
 	}
 
-	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		precondition(editingStyle == .delete)
 
 		let taskId = tableDataSource.taskId(for: indexPath)
