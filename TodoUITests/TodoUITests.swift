@@ -50,7 +50,7 @@ class TodoUITests: XCTestCase {
 
 		let taskSwitch = app.switches[text]
 
-		XCTAssertTrue(taskSwitch.value as! Bool)
+		XCTAssertEqual(taskSwitch.value as! String, "0")
 
 		taskSwitch.tap() // Mark task as completed
 
