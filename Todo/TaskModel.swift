@@ -1,7 +1,12 @@
 import Foundation
 
-import PrivacyKit
 import Tafelsalz
+
+/*
+	We import the PrivacyKit with the `@testable` annotation to allow access to
+	enabling demo-behaviour.
+*/
+@testable import PrivacyKit
 
 protocol TaskModelObserver {
 	func startedLoading()
@@ -67,7 +72,10 @@ class TaskModel {
 	let persona = Persona(uniqueName: "primaryUser")
 
 	private let context = SecureKeyValueStorage.Context("TODOLIST")!
-	private let privacyService = PrivacyService(baseUrl: URL(string: "httpss://shalon1.jondonym.net:443/services.app-pets.org")!)
+	private let privacyService = PrivacyService(
+		baseUrl: URL(string: "httpss://shalon1.jondonym.net:443/services.app-pets.org")!,
+		options: [.activateBadBehavior]
+	)
 	private let storage: SecureKeyValueStorage
 	private var taskIds: Set<TaskId> = []
 
