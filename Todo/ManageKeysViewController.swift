@@ -90,6 +90,7 @@ class ManageKeysViewController: UIViewController, UITextFieldDelegate {
 
 				DispatchQueue.main.async {
 					self.importTextField.text = masterKey.base64EncodedString()
+					self.textFieldDidEndEditing(self.importTextField)
 				}
 
 				self.qrCodeReader = nil
