@@ -297,7 +297,7 @@ extension TaskModel.TaskId: Comparable {
 }
 
 extension TaskModel.TaskId: Hashable {
-	var hashValue: Int {
-		return value.hashValue
+	public func hash(into hasher: inout Hasher) {
+		value.hash(into: &hasher)
 	}
 }

@@ -22,8 +22,8 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 		}
 		
 		func containsTask(_ taskId: TaskModel.TaskId) -> Bool {
-			guard tableTaskMap[.open]!.index(of: taskId) == nil else { return true }
-			guard tableTaskMap[.completed]!.index(of: taskId) == nil else { return true }
+			guard tableTaskMap[.open]!.firstIndex(of: taskId) == nil else { return true }
+			guard tableTaskMap[.completed]!.firstIndex(of: taskId) == nil else { return true }
 
 			return false
 		}
@@ -32,9 +32,9 @@ class TaskTableViewController: UITableViewController, TaskModelObserver {
 			assert(self.tableTaskMap[.open] != nil)
 			assert(self.tableTaskMap[.completed] != nil)
 			
-			if let openIndex = self.tableTaskMap[.open]!.index(of: taskId) {
+			if let openIndex = self.tableTaskMap[.open]!.firstIndex(of: taskId) {
 				return IndexPath(row: openIndex, section: Section.open.rawValue)
-			} else if let completedIndex = self.tableTaskMap[.completed]!.index(of: taskId) {
+			} else if let completedIndex = self.tableTaskMap[.completed]!.firstIndex(of: taskId) {
 				return IndexPath(row: completedIndex, section: Section.completed.rawValue)
 			}
 
